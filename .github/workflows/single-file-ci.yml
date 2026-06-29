@@ -1,0 +1,24 @@
+name: single-file-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  single-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile single file
+        run: rustc --edition=2024 hftbt.rs -o /tmp/hftbt
+      - name: Help smoke
+        run: /tmp/hftbt --help
+      - name: Recreate harness
+        run: /tmp/hftbt harness
+      - name: Cargo check through bootstrap
+        run: /tmp/hftbt check
+      - name: AGA smoke
+        run: /tmp/hftbt aga-auto
+      - name: Portable proof compile-only
+        run: /tmp/hftbt portable-proof --skip-e2e
